@@ -1,12 +1,35 @@
-var http  = require('http');
+const express = require('express');
+const app = express();
+const users = require('./modules/users');
+const mysql = require('mysql');
 
-var server = http.createServer(function(req, res){
-    res.write('Hello World');
-    res.end();
+var connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'root',
+  password : '',
+  database : 'friendly'
 });
 
-var port = process.env.PORT || 8000;
+connection.connect();
 
-server.listen(port, function() {
-    console.log("App is running on port " + port);
-});
+app.get('/', function (req, res) {
+   res.send('Hello World');
+})
+
+app.post('/add', function (req, res) {
+  var post  = {
+    name: 'Tessmann', 
+    id_external: 'dsdsjdsjhds76s7ds'
+  };
+  var query = connection.query('INSERT INTO users SET ?', post, function (error, results, fields) {
+    if (error) throw error;
+    res.send('Success!');
+  });
+})
+
+var server = app.listen(8081, function () {
+   var host = server.address().address
+   var port = server.address().port
+   
+   console.log("Example app listening at http://%s:%s", host, port)
+})
